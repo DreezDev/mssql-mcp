@@ -36,7 +36,13 @@ jobs:
 
       - name: Check package structure
         run: |
-          uv run python -c "import dreez_mssql_mcp; print('✅ Package import OK - v' + dreez_mssql_mcp.__version__)"
+          uv run python -c "
+          import dreez_mssql_mcp
+          from dreez_mssql_mcp.server import main
+          print('✅ Package import OK')
+          print('📦 Version:', dreez_mssql_mcp.__version__)
+          print('🚀 Entry point main() found')
+          "
 
       - name: Build distribution
         run: uv build
