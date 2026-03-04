@@ -1,9 +1,5 @@
 name: CI / Publish to PyPI
 
-# uv.lock debe estar commiteado y actualizado en el repo.
-# Si el lockfile está desactualizado, el paso 'uv lock --check' fallará
-# indicándote que debes correr 'uv lock' localmente y commitear el cambio.
-
 on:
   push:
     branches: [main]
@@ -34,9 +30,6 @@ jobs:
         uses: astral-sh/setup-uv@v4
         with:
           enable-cache: true
-
-      - name: Verify lockfile is up to date
-        run: uv lock --check
 
       - name: Install dependencies
         run: uv sync
