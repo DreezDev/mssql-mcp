@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dreez-mssql-mcp"
-version = "0.1.0"
+version = "1.0.0"
 description = "MCP Server custom para SQL Server"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,3 +15,4 @@ dreez-mssql-mcp = "dreez_mssql_mcp.server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["dreez_mssql_mcp"]
+
