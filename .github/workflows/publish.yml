@@ -1,0 +1,82 @@
+name: CI / Publish to PyPI
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*.*.*"         # Dispara el publish en tags tipo v0.1.0
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # ── Job 1: Build & validate ──────────────────────────────────────────────────
+  build:
+    name: Build & validate package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Check package structure
+        run: |
+          uv run python -c "import dreez_mssql_mcp; print('✅ Package import OK - v' + dreez_mssql_mcp.__version__)"
+
+      - name: Build distribution
+        run: uv build
+
+      - name: Verify dist files
+        run: |
+          ls -lh dist/
+          uv run python -m zipfile -l dist/*.whl
+
+      - name: Upload dist as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 7
+
+  # ── Job 2: Publish to PyPI (solo en tags v*) ─────────────────────────────────
+  publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: build                       # Solo corre si build pasó
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    # Trusted Publisher (sin secretos) — configurar en pypi.org
+    permissions:
+      id-token: write                  # Necesario para OIDC Trusted Publisher
+      contents: read
+
+    environment:
+      name: pypi
+      url: https://pypi.org/project/dreez-mssql-mcp/
+
+    steps:
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # Sin username/password: usa OIDC Trusted Publisher
+        # Configurar en: https://pypi.org/manage/project/dreez-mssql-mcp/settings/publishing/
