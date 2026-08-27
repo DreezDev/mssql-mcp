@@ -7,7 +7,7 @@ import os
 import re
 import json
 import pyodbc
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 
 # ── Modo solo lectura ──────────────────────────────────────────────────────────
 # Poner READ_ONLY=false en el entorno para permitir escritura (no recomendado).
@@ -41,7 +41,7 @@ def get_connection() -> pyodbc.Connection:
 
 
 # ── Servidor MCP ───────────────────────────────────────────────────────────────
-mcp = FastMCP("BAIC SQL Server MCP")
+mcp = MCPServer("BAIC SQL Server MCP")
 
 
 # ── Tool: ejecutar query SELECT ────────────────────────────────────────────────
